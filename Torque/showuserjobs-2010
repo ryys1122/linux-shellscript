@@ -1,0 +1,75 @@
+#!/bin/sh
+
+# Show the current batch jobs status broken down into userids
+
+# Author: Ole H. Nielsen, Technical University of Denmark
+# E-mail: Ole.H.Nielsen@fysik.dtu.dk
+# Thanks to Garrick Staples for suggesting the getent command.
+
+SHOWQ=/usr/local/bin/showq
+
+echo Batch job status at `date`
+cat <<EOF
+             Running       Idle    
+Username    Jobs Procs   Jobs Procs  Group     Further info
+========    ==== =====   ==== =====  ========  =============================
+EOF
+
+$SHOWQ | egrep 'Running  |Idle  |Hold  ' | awk '
+BEGIN {
+	# First get the list of group names 
+	while ("getent group" | getline ) {
+		split($0,b,":")		# Split group line into fields
+		group[b[3]] = b[1]	# Group name b[1] of this groupid (b[3])
+	}
+	# Then get the list of user full names from passwd lines
+	while ("getent passwd" | getline ) {
+		split($0,b,":")		# Split password line into fields
+		fullname[b[1]] = b[5]	# Full name b[5] of this username (b[1])
+		groupname[b[1]] = group[b[4]]	# Group name of this GID (numeric group id)
+	}
+}
+{
+	userid=$2
+	status=$3
+	nprocs=$4
+	userlist[userid] = userid
+	if (status == "Running" ) {
+		running[userid]++
+		totalrun++
+		runprocs[userid] += nprocs
+		totalrunprocs += nprocs
+	}
+	else if (status == "Idle" || status == "Hold" || status == "BatchHold") {
+		idle[userid]++
+		totalidle++
+		idleprocs[userid] += nprocs
+		totalidleprocs += nprocs
+	}
+} END {
+	for (u in userlist) {
+		totalusers++
+		printf ("%-11s %4d %5d   %4d %5d  %-8s  %s\n",
+			userlist[u], running[u], runprocs[u], idle[u], idleprocs[u],
+			groupname[u], fullname[u])
+		# Accumulate group statistics
+		grp = groupname[u]
+		grouplist[grp] = grp
+		groupusers[grp]++
+		group_running[grp] += running[u]
+		group_runprocs[grp] += runprocs[u]
+		group_idle[grp] += idle[u]
+		group_idleprocs[grp] += idleprocs[u]
+	}
+	for (grp in grouplist) {
+		printf ("%-11s %4d %5d   %4d %5d  %-8s  running+idle=%d procs %d users\n",
+			"GROUP_TOTAL", group_running[grp], group_runprocs[grp],
+			group_idle[grp], group_idleprocs[grp], grp,
+			group_runprocs[grp]+group_idleprocs[grp], groupusers[grp])
+	}
+	printf ("%-11s %4d %5d   %4d %5d  %-8s  running+idle=%d procs %d users\n",
+		"GRAND_TOTAL", totalrun, totalrunprocs, totalidle, totalidleprocs, 
+		"ALL", totalrunprocs+totalidleprocs, totalusers)
+}' | sort -r -n -k 3 -k 5 
+
+# The sort command sorts number of running procs in descending order
