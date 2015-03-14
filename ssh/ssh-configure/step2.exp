@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]
+then
+{
+	echo usage: step2.exp username password
+	exit
+}
+fi;
+
+USERNAME=$1
+PASSWORD=$2
+
+rm -fr ${HOME}/.ssh/known_hosts
+
+#for ((node=1;node<=10;node++))
+for node in $(cat hostfile)
+do
+/usr/bin/expect <<EOF
+
+set force_conservative 0  ;# set to 1 to force conservative mode even if
+			  ;# script wasn't run conservatively originally
+if {\$force_conservative} {
+	set send_slow {1 .1}
+	proc send {ignore arg} {
+		sleep .1
+		exp_send -s -- \$arg
+	}
+}
+
+
+set timeout -1
+spawn ssh ${node} hostname
+match_max 100000
+expect -exact "Are you sure you want to continue connecting (yes/no)? "
+send -- "yes\r"
+expect -exact "${USERNAME}@${node}'s password: "
+send -- "${PASSWORD}\r"
+expect eof
+EOF
+done;
