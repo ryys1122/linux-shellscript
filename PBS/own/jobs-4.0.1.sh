@@ -1,8 +1,8 @@
 #!/bin/sh
 i=1
 # Locations of commands used
-PBSNODES=/opt/gridview//pbs/dispatcher/bin/pbsnodes
-QSTAT=/opt/gridview//pbs/dispatcher/bin/qstat
+PBSNODES=`which pbsnodes`
+QSTAT=`which qstat`
 AWK=/bin/awk
 
 echo -e "there are total 63 nodes in the system 
