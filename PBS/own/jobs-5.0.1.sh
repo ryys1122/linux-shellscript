@@ -1,16 +1,14 @@
 #!/bin/sh
 i=1
-#This script is suitable for Torque under 5.0.1
-# Locations of commands used 
-#this is a test
-PBSNODES=/opt/gridview//pbs/dispatcher/bin/pbsnodes
-QSTAT=/opt/gridview//pbs/dispatcher/bin/qstat
+# Locations of commands used
+PBSNODES=/usr/local/bin/pbsnodes
+QSTAT=/usr/local/bin/qstat
 AWK=/bin/awk
-
-echo -e "there are total 63 nodes in the system 
+echo -e "there are total 11 nodes in the system 
 -----------------------------------------------------------"
 echo -e "\e[40;35m job-exclusive \e[40;32m  free \e[40;31m  down \e[40;34m  partlyused \e[40;33m offline \e[40;36m unknown \e[m "
 echo -e "---------------------------------------------------------------"
+
 $PBSNODES -a | $AWK -v listflagged=$listflagged -v QSTAT=$QSTAT '
 BEGIN {
 	#
@@ -46,6 +44,14 @@ NF==1 {	node=$1				# 1st line is nodename
 		else if ($1 == "jobs"){		
 			split($0,a,",")
 			numcpus[node] = length(a)
+			for(us in a){
+				if(a[us] ~ /-/){
+					split(a[us],c,"-")
+					split(c[2],d,"/")
+					num = d[1] - c[1]
+					numcpus[node] += num
+				}
+			}
 		}
 		else if ($1 == "state") {
                         if ($3 == "job-exclusive")                      state[node] = "excl"
