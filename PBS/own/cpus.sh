@@ -1,8 +1,10 @@
 #!/bin/sh
 
 # Locations of commands used
-PBSNODES=/opt/gridview//pbs/dispatcher/bin/pbsnodes
-QSTAT=/opt/gridview//pbs/dispatcher/bin/qstat
+#PBSNODES=/opt/gridview//pbs/dispatcher/bin/pbsnodes
+PBSNODES=`which pbsnodes`
+#QSTAT=/opt/gridview//pbs/dispatcher/bin/qstat
+QSTAT=`wihch qstat`
 AWK=/bin/awk
 
 $PBSNODES -a | $AWK -v listflagged=$listflagged -v QSTAT=$QSTAT '
