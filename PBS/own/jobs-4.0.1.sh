@@ -1,7 +1,6 @@
 #!/bin/sh
 i=1
-# Locations of commands used 
-#this is a test
+# Locations of commands used
 PBSNODES=/opt/gridview//pbs/dispatcher/bin/pbsnodes
 QSTAT=/opt/gridview//pbs/dispatcher/bin/qstat
 AWK=/bin/awk
