@@ -21,13 +21,21 @@ BEGIN {
 		}
 	}
 	close(QSTAT)
+	total_cpu = 0
 }
 NF==1 { node=$1
         getline                         # Get the next input line
         while (NF >= 3) {               # Read a number of non-blank lines
                 if ($1 == "np")            np[node] = $3
                 else if ($1 == "properties")    properties[node] = $3
-                else if ($1 == "ntype")         ntype[node] = $3
+                else if ($1 == "ntype")         {ntype[node] = $3}
+		else if ($1 == "status"){
+			match($0,/ncpus=[0-9]+/)
+			A = substr($0,RSTART,RLENGTH)
+			match(A,/[0-9]+/)
+			B = substr(A,RSTART,RLENGTH)
+			total_cpu += B
+		}
                 else if ($1 == "jobs") {
 			 split($0,a,",")
 			 for(field in a){
@@ -48,6 +56,6 @@ END{
 		j=jobs[user]
 		printf("%8s\t%4d\n",user,j)|"sort -nrk 2"
 	}
-	printf("\033[40;31m%8s\t%4d/1412\033[0m\n", "total", total)
+	printf("\033[40;31m%8s\t%4d/%4d\033[0m\n", "total", total,total_cpu)
 }
 '
