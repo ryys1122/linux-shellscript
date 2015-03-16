@@ -1,8 +1,8 @@
 #!/bin/sh
 i=1
 # Locations of commands used
-PBSNODES=/usr/local/bin/pbsnodes
-QSTAT=/usr/local/bin/qstat
+PBSNODES=`which pbsnodes`
+QSTAT=`which qstat`
 AWK=/bin/awk
 echo -e "there are total 11 nodes in the system 
 -----------------------------------------------------------"
