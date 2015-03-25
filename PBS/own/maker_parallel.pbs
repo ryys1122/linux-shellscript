@@ -7,20 +7,8 @@
 
 # -l nodes=node63:ppn=30+node62:ppn=30
 # -l nodes=2:ppn=80
-#cd /data4/hliu/work_current/annotation/maker
-#cat > ~/.mpd.conf
-#user secretword=liuhao123
-#source /public/software/mpi/impi/4.1.0.024/bin64/mpivars.sh
-#source /public/software/profile.d/mpivars.sh
+source /public/software/mpi/impi/4.1.0.024/bin64/mpivars.sh
+source /public/software/profile.d/mpivars.sh
 cd $PBS_O_WORKDIR
 NP=`cat $PBS_NODEFILE|wc -l`
-#cat $PBS_NODEFILE | uniq -c |awk '{printf("%s:%s\n",$2,$1);}' > ma
-#NNODE=`cat $PBS_NODEFILE|wc -l`
-#awk -F ":" '{print $1}' ma >hostfile
-##mpdboot -n $NNODE -f ma
-##mpdboot -n $NNODE -f hostfile -r rsh --ifhn=node102
-#mpdboot -n $NNODE -f hostfile -r rsh 
-#mpiexec -machinefile ma -np $NP  maker
-#mpdallexit
-#mpirun -f hostfile -n $NP maker
 mpirun -r ssh -machinefile $PBS_NODEFILE -np $NP maker
