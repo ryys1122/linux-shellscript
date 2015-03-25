@@ -1,0 +1,12 @@
+#PBS -N cpi_test
+#PBS -l nodes=2:ppn=2
+#PBS -V  
+#PBS -j oe
+#PBS -q batch
+echo $PBS_O_WORKDIR
+echo $PBS_NODEFILE
+NP=`cat $PBS_NODEFILE|wc -l`
+echo $NP
+date
+sleep 5
+date

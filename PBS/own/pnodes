@@ -1,0 +1,82 @@
+#!/bin/bash
+declare -a  node
+declare  -a coler
+typeset -i i n down jobexec  free offline unknown
+n=0
+i=0
+down=0
+jobexec=0
+free=0
+partused=0
+offline=0
+unknown=0
+for nodename  in `pbsnodes -l all |awk '{print $1}'|sed -s 's/[a-z]+//g'`
+do
+trap "" TSTP 
+pbsnodes -q $nodename | grep jobs | grep -v status  | tr "," "\n" > /tmp/nodenamefile.$$
+sed -i '/^$/d'  /tmp/nodenamefile.$$
+number=`cat /tmp/nodenamefile.$$ | wc -l`
+if [ $nodename = "node62" ];then
+echo ""$nodename"-"$number"/96" >> /tmp/display.$$
+elif [ $nodename = "node63" ];then
+echo ""$nodename"-"$number"/96" >> /tmp/display.$$
+else
+echo ""$nodename"-"$number"/20" >> /tmp/display.$$
+fi
+statu=`pbsnodes -l  all | grep "\<${nodename}\>" | awk '{print $2}'`
+node[$i]=`cat /tmp/display.$$  | grep ${nodename}`
+case ${statu} in 
+free)
+if [ $number = 0 ]
+then
+coler[$i]=32
+let free=free+1
+else 
+coler[$i]=34
+let partused=partused+1
+fi
+;;
+job-exclusive)
+coler[$i]=35
+let jobexec=jobexec+1
+;;
+down)
+coler[$i]=31
+let down=down+1
+;;
+offline)
+coler[$i]=33
+let offline=offline+1
+;;
+unknown)
+coler[$i]=36
+let unknown=unknown+1
+;;
+esac
+let i=i+1
+done
+jiedian=`cat /tmp/display.$$ |wc -l`
+echo -e "there is total $jiedian nodes in the system 
+-----------------------------------------------------------
+\e[40;32m free=$free \e[40;35m jobexece=$jobexec \e[40;31m down=$down \e[40;34m partlyused=$partused \e[40;33m offline=$offline \e[40;36m unknown=$unknown \e[m
+---------------------------------------------------------------"
+
+echo -e "\e[40;35m job-exclusive \e[40;32m  free \e[40;31m  down \e[40;34m  partlyused \e[40;33m offline \e[40;36m unknown \e[m "
+   
+echo "----------------------------------------------------------"   
+echo -e "\e[40;${coler[0]}m ${node[0]} \e[40;${coler[1]}m ${node[1]} \e[40;${coler[2]}m ${node[2]} \e[40;${coler[3]}m ${node[3]} \e[40;${coler[4]}m ${node[4]} \e[m "
+echo -e "\e[40;${coler[5]}m ${node[5]} \e[40;${coler[6]}m ${node[6]} \e[40;${coler[7]}m ${node[7]} \e[40;${coler[8]}m ${node[8]} \e[40;${coler[9]}m ${node[9]} \e[m "
+echo -e "\e[40;${coler[10]}m ${node[10]} \e[40;${coler[11]}m ${node[11]} \e[40;${coler[12]}m ${node[12]} \e[40;${coler[13]}m ${node[13]} \e[40;${coler[14]}m ${node[14]} \e[m "
+echo -e "\e[40;${coler[15]}m ${node[15]} \e[40;${coler[16]}m ${node[16]} \e[40;${coler[17]}m ${node[17]} \e[40;${coler[18]}m ${node[18]} \e[40;${coler[19]}m ${node[19]} \e[m "
+echo -e "\e[40;${coler[20]}m ${node[20]} \e[40;${coler[21]}m ${node[21]} \e[40;${coler[22]}m ${node[22]} \e[40;${coler[23]}m ${node[23]} \e[40;${coler[24]}m ${node[24]} \e[m "
+echo -e "\e[40;${coler[25]}m ${node[25]} \e[40;${coler[26]}m ${node[26]} \e[40;${coler[27]}m ${node[27]} \e[40;${coler[28]}m ${node[28]} \e[40;${coler[29]}m ${node[29]} \e[m "
+echo -e "\e[40;${coler[30]}m ${node[30]} \e[40;${coler[31]}m ${node[31]} \e[40;${coler[32]}m ${node[32]} \e[40;${coler[33]}m ${node[33]} \e[40;${coler[34]}m ${node[34]} \e[m "
+echo -e "\e[40;${coler[35]}m ${node[35]} \e[40;${coler[36]}m ${node[36]} \e[40;${coler[37]}m ${node[37]} \e[40;${coler[38]}m ${node[38]} \e[40;${coler[39]}m ${node[39]} \e[m "
+echo -e "\e[40;${coler[40]}m ${node[40]} \e[40;${coler[41]}m ${node[41]} \e[40;${coler[42]}m ${node[42]} \e[40;${coler[43]}m ${node[43]} \e[40;${coler[44]}m ${node[44]} \e[m "
+echo -e "\e[40;${coler[45]}m ${node[45]} \e[40;${coler[46]}m ${node[46]} \e[40;${coler[47]}m ${node[47]} \e[40;${coler[48]}m ${node[48]} \e[40;${coler[49]}m ${node[49]} \e[m "
+echo -e "\e[40;${coler[50]}m ${node[50]} \e[40;${coler[51]}m ${node[51]} \e[40;${coler[52]}m ${node[52]} \e[40;${coler[53]}m ${node[53]} \e[40;${coler[54]}m ${node[54]} \e[m "
+echo -e "\e[40;${coler[55]}m ${node[55]} \e[40;${coler[56]}m ${node[56]} \e[40;${coler[57]}m ${node[57]} \e[40;${coler[58]}m ${node[58]} \e[40;${coler[59]}m ${node[59]} \e[m "
+echo -e "\e[40;${coler[60]}m ${node[60]} \e[40;${coler[61]}m ${node[61]} \e[40;${coler[62]}m ${node[62]}  \e[m "
+rm -rf /tmp/nodenamefile.$$
+rm -rf /tmp/nodenamelast.$$
+rm -rf /tmp/display.$$

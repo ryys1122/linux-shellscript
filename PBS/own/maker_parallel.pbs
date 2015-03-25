@@ -1,0 +1,14 @@
+#PBS -N maker 
+#PBS -l nodes=61:ppn=20
+#PBS -j oe
+#PBS -q all
+#PBS -V  
+
+
+# -l nodes=node63:ppn=30+node62:ppn=30
+# -l nodes=2:ppn=80
+source /public/software/mpi/impi/4.1.0.024/bin64/mpivars.sh
+source /public/software/profile.d/mpivars.sh
+cd $PBS_O_WORKDIR
+NP=`cat $PBS_NODEFILE|wc -l`
+mpirun -r ssh -machinefile $PBS_NODEFILE -np $NP maker
