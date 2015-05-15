@@ -42,7 +42,7 @@ NF==1 {	node=$1				# 1st line is nodename
 	while (NF >= 3) {		# Read a number of non-blank lines
 		if ($1 == "np")		np[node] = $3
 		else if ($1 == "jobs"){		
-			split($0,a,",")
+			split($3,a,",")
 			numcpus[node] = length(a)
 			for(us in a){
 				if(a[us] ~ /-/){
